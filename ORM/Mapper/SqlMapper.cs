@@ -4,7 +4,7 @@ using System.Text;
 
 namespace skroy.ORM.Mapper;
 
-public class SqlMapper
+public class SqlMapper : ISqlMapper
 {
     private readonly Dialect dialect;
     private readonly Dictionary<Type, Mapping> Mappings;
@@ -69,9 +69,22 @@ public class SqlMapper
     public string MapInsert<T>(T obj) where T : class
     {
         var mapping = GetMapping<T>();
-        var columnNames = string.Join(',', mapping.Columns.Select(x => $"[{x.Name}]"));
-        var values = string.Join(',', mapping.Columns.Select(column => GetPropertyStringValue(obj, column.Name)));
-        return $"insert into {mapping.TableName} ({columnNames}) values ({values}); {dialect.SelectLastRow};";
+		var columns = mapping.Columns.Where(x => x.Name != mapping.PrimaryKey.Name);
+		var columnNames = string.Join(',', columns.Select(x => $"[{x.Name}]"));
+        var values = $"({string.Join(',', columns.Select(column => GetPropertyStringValue(obj, column.Name)))})";
+		return $"insert into {mapping.TableName} ({columnNames}) values {string.Join(',', values)}; {dialect.SelectLastRow};";
+	}
+
+	public string MapInsert<T>(params T[] objs) where T : class
+    {
+        if (objs.Length == 0 || objs.Length > 1000)
+            throw new ArgumentException("Insert statement must have between 1 and 1000 values");
+
+        var mapping = GetMapping<T>();
+		var columns = mapping.Columns.Where(x => x.Name != mapping.PrimaryKey.Name);
+		var columnNames = string.Join(',', columns.Select(x => $"[{x.Name}]"));
+        var values = objs.Select(obj => $"({string.Join(',', columns.Select(column => GetPropertyStringValue(objs, column.Name)))})").ToList();
+		return $"insert into {mapping.TableName} ({columnNames}) values {string.Join(',', values)}; {dialect.SelectLastRow};";
     }
 
     public string MapSelect<T>() where T : class
@@ -103,6 +116,26 @@ public class SqlMapper
         var mapping = GetMapping<T>();
         return $"delete from {mapping.TableName} where {MapPrimaryKeyCondition(obj, mapping)};";
     }
+
+	public string MapDelete<T>(Expression<Func<T, bool>> predicate) where T : class
+	{
+		var mapping = GetMapping<T>();
+		var body = predicate.Body as BinaryExpression;
+        if (body == null || body.NodeType != ExpressionType.Equal)
+            throw new ArgumentException("Expression is not a value equality comparison");
+
+		var isLeftMemberExpression = body.Left is MemberExpression me && me.Expression.Type == typeof(T);
+		var (memberExpression, valueExpression) = isLeftMemberExpression ? (body.Left, body.Right) : (body.Right, body.Left);
+		var member = ((MemberExpression)memberExpression).Member.Name;
+		var value = Expression.Lambda(valueExpression).Compile().DynamicInvoke();
+		return $"delete from {mapping.TableName} where [{member}]={GetStringValue(value)}";
+	}
+
+	public string MapDrop<T>() where T : class
+	{
+        var mapping = GetMapping<T>();
+		return $"drop table {mapping.TableName}";
+	}
 
 
     private Mapping<T> GetMapping<T>() where T : class

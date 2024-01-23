@@ -37,6 +37,12 @@ public class Database
 		return adapter.ExecuteScalar<object>(query);
 	}
 
+	public object Insert<T>(params T[] objs) where T : class
+	{
+		var query = sqlMapper.MapInsert(objs);
+		return adapter.ExecuteScalar<object>(query);
+	}
+
 	public List<T> Select<T>() where T : class, new()
 	{
 		var query = sqlMapper.MapSelect<T>();
@@ -64,6 +70,18 @@ public class Database
 	public int Delete<T>(T obj) where T : class
 	{
 		var query = sqlMapper.MapDelete(obj);
+		return adapter.ExecuteNonQuery(query);
+	}
+
+	public int Delete<T>(Expression<Func<T, bool>> predicate) where T : class
+	{
+		var query = sqlMapper.MapDelete(predicate);
+		return adapter.ExecuteNonQuery(query);
+	}
+
+	public int Drop<T>() where T : class
+	{
+		var query = sqlMapper.MapDrop<T>();
 		return adapter.ExecuteNonQuery(query);
 	}
 }
