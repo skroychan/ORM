@@ -4,7 +4,7 @@ namespace skroy.ORM.Adapters;
 
 public class MySqlAdapter : IDbAdapter
 {
-	public int ExecuteNonQuery(string query)
+	public long ExecuteNonQuery(string query)
 	{
 		throw new NotImplementedException();
 	}

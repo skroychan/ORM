@@ -25,7 +25,7 @@ public class Database
 		return mapping;
 	}
 
-	public int Initialize()
+	public long Initialize()
 	{
 		var query = sqlMapper.MapCreate();
 		return adapter.ExecuteNonQuery(query);
@@ -55,31 +55,31 @@ public class Database
 		return adapter.ExecuteVector<T>(query, [.. sqlMapper.GetColumns(typeof(T))]).Single();
 	}
 
-	public int Update<T>(T obj) where T : class
+	public long Update<T>(T obj) where T : class
 	{
 		var query = sqlMapper.MapUpdate(obj);
 		return adapter.ExecuteNonQuery(query);
 	}
 
-	public int Update<T>(T obj, Expression<Action<T>> memberInitializer) where T : class
+	public long Update<T>(T obj, Expression<Action<T>> memberInitializer) where T : class
 	{
 		var query = sqlMapper.MapUpdate(obj, memberInitializer);
 		return adapter.ExecuteNonQuery(query);
 	}
 
-	public int Delete<T>(T obj) where T : class
+	public long Delete<T>(T obj) where T : class
 	{
 		var query = sqlMapper.MapDelete(obj);
 		return adapter.ExecuteNonQuery(query);
 	}
 
-	public int Delete<T>(Expression<Func<T, bool>> predicate) where T : class
+	public long Delete<T>(Expression<Func<T, bool>> predicate) where T : class
 	{
 		var query = sqlMapper.MapDelete(predicate);
 		return adapter.ExecuteNonQuery(query);
 	}
 
-	public int Drop<T>() where T : class
+	public long Drop<T>() where T : class
 	{
 		var query = sqlMapper.MapDrop<T>();
 		return adapter.ExecuteNonQuery(query);

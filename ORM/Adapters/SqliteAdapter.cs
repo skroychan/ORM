@@ -23,7 +23,7 @@ public class SqliteAdapter : IDbAdapter
     }
 
 
-	public int ExecuteNonQuery(string query)
+	public long ExecuteNonQuery(string query)
 	{
 		using var transaction = connection.BeginTransaction();
 
