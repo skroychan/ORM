@@ -66,9 +66,9 @@ public class SqlMapper : ISqlMapper
         return sb.ToString();
     }
 
-    public string MapInsert<T>(T obj) where T : class
-    {
-        var mapping = GetMapping<T>();
+	public string MapInsert<T>(T obj) where T : class
+	{
+		var mapping = GetMapping<T>();
 		var columns = mapping.Columns.Where(x => x.Name != mapping.PrimaryKey.Name);
 		var columnNames = string.Join(',', columns.Select(x => $"[{x.Name}]"));
         var values = $"({string.Join(',', columns.Select(column => GetPropertyStringValue(obj, column.Name)))})";
@@ -115,7 +115,7 @@ public class SqlMapper : ISqlMapper
     {
         var mapping = GetMapping<T>();
         return $"delete from {mapping.TableName} where {MapPrimaryKeyCondition(obj, mapping)};";
-    }
+	}
 
 	public string MapDelete<T>(Expression<Func<T, bool>> predicate) where T : class
 	{
@@ -138,7 +138,7 @@ public class SqlMapper : ISqlMapper
 	}
 
 
-    private Mapping<T> GetMapping<T>() where T : class
+	private Mapping<T> GetMapping<T>() where T : class
     {
         if (!Mappings.TryGetValue(typeof(T), out var mapping))
             throw new ArgumentException($"Cannot find mapping for {typeof(T)}");
@@ -146,12 +146,12 @@ public class SqlMapper : ISqlMapper
         return (Mapping<T>)mapping;
     }
 
-    private string MapPrimaryKeyCondition<T>(T obj, Mapping<T> mapping) where T : class
+    private static string MapPrimaryKeyCondition<T>(T obj, Mapping<T> mapping) where T : class
     {
         return MapAssignment(obj, mapping.PrimaryKey.Name);
     }
 
-    private string MapSet<T>(Mapping<T> mapping, T obj) where T : class
+    private static string MapSet<T>(Mapping<T> mapping, T obj) where T : class
     {
         const string separator = ",";
         var assignments = new StringBuilder();
@@ -161,12 +161,14 @@ public class SqlMapper : ISqlMapper
         return assignments.ToString();
     }
 
-    private string MapSet<T>(Mapping<T> mapping, Expression<Action<T>> memberInitializer) where T : class
+    private static string MapSet<T>(Mapping<T> mapping, Expression<Action<T>> memberInitializer) where T : class
     {
         const string separator = ",";
         var assignments = new StringBuilder();
-        var expression = (MemberInitExpression)memberInitializer.Body;
-        foreach (var binding in expression.Bindings)
+		if (memberInitializer.Body is not MemberInitExpression expression)
+			throw new ArgumentException("Expression is not a member initializer");
+
+		foreach (var binding in expression.Bindings)
         {
             var column = binding.Member.Name;
             if (!mapping.Columns.Any(x => x.Name == column))
@@ -182,28 +184,26 @@ public class SqlMapper : ISqlMapper
         return assignments.ToString();
     }
 
-    private string MapAssignment<T>(T obj, string propertyName) where T : class
+    private static string MapAssignment<T>(T obj, string propertyName) where T : class
     {
         return $"[{propertyName}]={GetPropertyStringValue(obj, propertyName)}";
     }
 
-    private string GetPropertyStringValue(object obj, string propertyName)
+    private static string GetPropertyStringValue(object obj, string propertyName)
     {
-        return GetStringValue(GetProperty(obj, propertyName));
+		var propertyValue = obj.GetType().GetProperty(propertyName).GetValue(obj);
+		return GetStringValue(propertyValue);
     }
 
-    private static object GetProperty(object obj, string propertyName)
+	private static string GetStringValue(object obj)
     {
-        return obj.GetType().GetProperty(propertyName).GetValue(obj);
-    }
+        if (obj == null)
+            return "NULL";
 
-    private static string GetStringValue(object obj)
-    {
-        return obj == null ? "NULL" : IsString(obj.GetType()) ? $"'{obj}'" : obj.ToString();
-    }
+		var type = obj.GetType();
+		if (type == typeof(string) || type == typeof(char) || type == typeof(DateTime) || type.IsEnum)
+            return $"'{obj}'";
 
-    private static bool IsString(Type type)
-    {
-        return type == typeof(string) || type == typeof(char);
+		return obj.ToString();
     }
 }

@@ -76,7 +76,7 @@ public class SqliteAdapter : IDbAdapter
 				var obj = new T();
 				foreach (var column in columns)
 				{
-					var value = reader.IsDBNull(reader.GetOrdinal(column.Name)) ? null : Convert.ChangeType(reader[column.Name], column.Type);
+					var value = GetValue(reader, column);
 					typeof(T).GetProperty(column.Name).SetValue(obj, value);
 				}
 				result.Add(obj);
@@ -89,6 +89,17 @@ public class SqliteAdapter : IDbAdapter
 		{
 			transaction.Rollback();
 			throw;
+		}
+
+		object GetValue(SqliteDataReader reader, Column column)
+		{
+			if (reader.IsDBNull(reader.GetOrdinal(column.Name)))
+				return null;
+
+			if (column.Type.IsEnum && Enum.TryParse(column.Type, reader[column.Name].ToString(), out var result))
+				return result;
+			
+			return Convert.ChangeType(reader[column.Name], column.Type);
 		}
 	}
 }

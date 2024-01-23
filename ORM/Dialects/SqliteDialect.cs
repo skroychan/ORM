@@ -7,6 +7,9 @@ public class SqliteDialect : Dialect
 
 	public override string GetDbType(Type type)
 	{
+		if (type.IsEnum)
+			return "text";
+
 		var typeCode = Type.GetTypeCode(type);
 		switch (typeCode)
 		{
