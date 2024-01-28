@@ -61,7 +61,7 @@ public class SqliteAdapter : IDbAdapter
 		}
 	}
 
-	public List<T> ExecuteVector<T>(string query, params Column[] columns) where T : new()
+	public IEnumerable<T> ExecuteVector<T>(string query, params Column[] columns) where T : new()
 	{
 		var result = new List<T>();
 		using var transaction = connection.BeginTransaction();

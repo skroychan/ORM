@@ -6,5 +6,5 @@ public interface IDbAdapter
 {
 	public long ExecuteNonQuery(string query);
 	public T ExecuteScalar<T>(string query);
-	public List<T> ExecuteVector<T>(string query, params Column[] columns) where T : new();
+	public IEnumerable<T> ExecuteVector<T>(string query, params Column[] columns) where T : new();
 }

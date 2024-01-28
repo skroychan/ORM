@@ -43,7 +43,7 @@ public class Database
 		return adapter.ExecuteScalar<object>(query);
 	}
 
-	public List<T> Select<T>() where T : class, new()
+	public IEnumerable<T> Select<T>() where T : class, new()
 	{
 		var query = sqlMapper.MapSelect<T>();
 		return adapter.ExecuteVector<T>(query, [.. sqlMapper.GetColumns(typeof(T))]);

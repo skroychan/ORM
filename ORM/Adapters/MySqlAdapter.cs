@@ -14,7 +14,7 @@ public class MySqlAdapter : IDbAdapter
 		throw new NotImplementedException();
 	}
 
-	public List<T> ExecuteVector<T>(string query, params Column[] columns) where T : new()
+	public IEnumerable<T> ExecuteVector<T>(string query, params Column[] columns) where T : new()
 	{
 		throw new NotImplementedException();
 	}
