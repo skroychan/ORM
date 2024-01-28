@@ -83,7 +83,7 @@ public class SqlMapper : ISqlMapper
         var mapping = GetMapping<T>();
 		var columns = mapping.Columns.Where(x => x.Name != mapping.PrimaryKey.Name);
 		var columnNames = string.Join(',', columns.Select(x => $"[{x.Name}]"));
-        var values = objs.Select(obj => $"({string.Join(',', columns.Select(column => GetPropertyStringValue(objs, column.Name)))})").ToList();
+        var values = objs.Select(obj => $"({string.Join(',', columns.Select(column => GetPropertyStringValue(obj, column.Name)))})").ToList();
 		return $"insert into {mapping.TableName} ({columnNames}) values {string.Join(',', values)}; {dialect.SelectLastRow};";
     }
 
@@ -97,7 +97,7 @@ public class SqlMapper : ISqlMapper
     {
         var mapping = GetMapping<T>();
         return $"select * from {mapping.TableName} where {MapPrimaryKeyCondition(obj, mapping)};";
-    }
+	}
 
     public string MapUpdate<T>(T obj) where T : class
     {

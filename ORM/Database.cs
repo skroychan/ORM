@@ -52,7 +52,7 @@ public class Database
 	public T Select<T>(T obj) where T : class, new()
 	{
 		var query = sqlMapper.MapSelect(obj);
-		return adapter.ExecuteVector<T>(query, [.. sqlMapper.GetColumns(typeof(T))]).Single();
+		return adapter.ExecuteVector<T>(query, [.. sqlMapper.GetColumns(typeof(T))]).SingleOrDefault();
 	}
 
 	public long Update<T>(T obj) where T : class
