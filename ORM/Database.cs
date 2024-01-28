@@ -78,10 +78,4 @@ public class Database
 		var query = sqlMapper.MapDelete(predicate);
 		return adapter.ExecuteNonQuery(query);
 	}
-
-	public long Drop<T>() where T : class
-	{
-		var query = sqlMapper.MapDrop<T>();
-		return adapter.ExecuteNonQuery(query);
-	}
 }
