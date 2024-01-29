@@ -139,19 +139,35 @@ public class DatabaseTest : IClassFixture<DatabaseFixture>, IDisposable
     [Fact]
     public void Delete()
     {
-        var person1 = new Person();
-        var person2 = new Person();
-        person1.Id = (long)Database.Insert(person1);
-        person2.Id = (long)Database.Insert(person2);
+        var person = new Person();
+        person.Id = (long)Database.Insert(person);
 
-        var affectedRows = Database.Delete(person1);
-        affectedRows += Database.Delete<Person>(x => x.Id == person2.Id);
+        var affectedRows = Database.Delete(person);
 
-        Assert.Equal(2, affectedRows);
+        Assert.Equal(1, affectedRows);
         Assert.Empty(Database.Select<Person>());
     }
 
-    [Fact]
+	[Fact]
+	public void Delete_Predicate()
+	{
+		var person1 = new Person();
+		var person2 = new Person();
+		var person3 = new Person();
+		person1.Id = (long)Database.Insert(person1);
+		person2.Id = (long)Database.Insert(person2);
+		person3.Id = (long)Database.Insert(person3);
+        var lambda = () => person3.Id;
+
+		var affectedRows = Database.Delete<Person>(x => person1.Id == x.Id);
+		affectedRows += Database.Delete<Person>(x => x.Id == person2.Id);
+		affectedRows += Database.Delete<Person>(x => x.Id == lambda());
+
+		Assert.Equal(3, affectedRows);
+		Assert.Empty(Database.Select<Person>());
+	}
+
+	[Fact]
     public void Delete_NoEntries()
     {
         var person = new Person();

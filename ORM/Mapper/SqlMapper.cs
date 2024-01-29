@@ -124,8 +124,8 @@ public class SqlMapper : ISqlMapper
         if (body == null || body.NodeType != ExpressionType.Equal)
             throw new ArgumentException("Expression is not a value equality comparison");
 
-		var isLeftMemberExpression = body.Left is MemberExpression me && me.Expression.Type == typeof(T);
-		var (memberExpression, valueExpression) = isLeftMemberExpression ? (body.Left, body.Right) : (body.Right, body.Left);
+		var isLeftParameterExpression = body.Left is MemberExpression me && me.Expression is ParameterExpression pe && pe.Name == predicate.Parameters.Single().Name;
+		var (memberExpression, valueExpression) = isLeftParameterExpression ? (body.Left, body.Right) : (body.Right, body.Left);
 		var member = ((MemberExpression)memberExpression).Member.Name;
 		var value = Expression.Lambda(valueExpression).Compile().DynamicInvoke();
 		return $"delete from {mapping.TableName} where [{member}]={GetStringValue(value)}";
