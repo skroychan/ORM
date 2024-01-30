@@ -46,13 +46,13 @@ public class Database
 	public IEnumerable<T> Select<T>() where T : class, new()
 	{
 		var query = sqlMapper.MapSelect<T>();
-		return adapter.ExecuteVector<T>(query, [.. sqlMapper.GetColumns(typeof(T))]);
+		return adapter.ExecuteVector<T>(query, [.. sqlMapper.GetColumns<T>()]);
 	}
 
 	public T Select<T>(T obj) where T : class, new()
 	{
 		var query = sqlMapper.MapSelect(obj);
-		return adapter.ExecuteVector<T>(query, [.. sqlMapper.GetColumns(typeof(T))]).SingleOrDefault();
+		return adapter.ExecuteVector<T>(query, [.. sqlMapper.GetColumns<T>()]).SingleOrDefault();
 	}
 
 	public long Update<T>(T obj) where T : class

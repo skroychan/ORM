@@ -22,9 +22,9 @@ public class SqlMapper : ISqlMapper
         Mappings.Add(typeof(T), mapping);
     }
 
-    public List<Column> GetColumns(Type mapping)
+    public IEnumerable<Column> GetColumns<T>()
     {
-        return Mappings[mapping].Columns;
+        return Mappings[typeof(T)].Columns;
     }
 
     public string MapCreate()
@@ -129,12 +129,6 @@ public class SqlMapper : ISqlMapper
 		var member = ((MemberExpression)memberExpression).Member.Name;
 		var value = Expression.Lambda(valueExpression).Compile().DynamicInvoke();
 		return $"delete from {mapping.TableName} where [{member}]={GetStringValue(value)}";
-	}
-
-	public string MapDrop<T>() where T : class
-	{
-        var mapping = GetMapping<T>();
-		return $"drop table {mapping.TableName}";
 	}
 
 
