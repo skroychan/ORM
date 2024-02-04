@@ -1,4 +1,5 @@
 using skroy.ORM.Tests.Entities;
+using Xunit;
 
 namespace skroy.ORM.Tests.DatabaseTests;
 
