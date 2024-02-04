@@ -6,6 +6,6 @@ public class ContactInfo
 	public long PersonId { get; set; }
 	public string Email { get; set; }
 	public string Phone { get; set; }
-	public double Latitude { get; set; }
-	public double Longitude { get; set; }
+	public double? Latitude { get; set; }
+	public double? Longitude { get; set; }
 }
