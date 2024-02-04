@@ -22,12 +22,12 @@ public class SqliteDialect : Dialect
 			case TypeCode.Int64:
 			case TypeCode.UInt64:
 			case TypeCode.Boolean:
-			case TypeCode.DateTime:
 				return "integer";
 			case TypeCode.Single:
 			case TypeCode.Double:
 			case TypeCode.Decimal:
 				return "real";
+			case TypeCode.DateTime:
 			case TypeCode.Char:
 			case TypeCode.String:
 				return "text";

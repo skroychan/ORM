@@ -32,7 +32,7 @@ public class SqlMapper : ISqlMapper
         var sb = new StringBuilder();
         foreach (var mapping in Mappings.Values)
         {
-            sb.Append($"create table if not exists {mapping.TableName} (");
+            sb.Append($"create table if not exists [{mapping.TableName}] (");
 
             foreach (var column in mapping.Columns)
             {
@@ -52,11 +52,11 @@ public class SqlMapper : ISqlMapper
                 if (!Mappings.TryGetValue(foreignKey.Value, out var referencedTable))
                     throw new ArgumentException($"Mapping of referenced table of type {foreignKey.Value} doesn't exist");
 
-                sb.Append("foreign key(")
+                sb.Append("foreign key([")
                     .Append(foreignKey.Key.Name)
-                    .Append(") references ")
+                    .Append("]) references [")
                     .Append(referencedTable.TableName)
-                    .Append("([").Append(referencedTable.PrimaryKey.Name).Append("])")
+                    .Append("]([").Append(referencedTable.PrimaryKey.Name).Append("])")
                     .Append(',');
             }
             sb.Remove(sb.Length - 1, 1);
@@ -72,7 +72,7 @@ public class SqlMapper : ISqlMapper
 		var columns = mapping.Columns.Where(x => x.Name != mapping.PrimaryKey.Name);
 		var columnNames = string.Join(',', columns.Select(x => $"[{x.Name}]"));
         var values = $"({string.Join(',', columns.Select(column => GetPropertyStringValue(obj, column.Name)))})";
-		return $"insert into {mapping.TableName} ({columnNames}) values {string.Join(',', values)}; {dialect.SelectLastRow};";
+		return $"insert into [{mapping.TableName}] ({columnNames}) values {string.Join(',', values)}; {dialect.SelectLastRow};";
 	}
 
 	public string MapInsert<T>(params T[] objs) where T : class
@@ -84,37 +84,37 @@ public class SqlMapper : ISqlMapper
 		var columns = mapping.Columns.Where(x => x.Name != mapping.PrimaryKey.Name);
 		var columnNames = string.Join(',', columns.Select(x => $"[{x.Name}]"));
         var values = objs.Select(obj => $"({string.Join(',', columns.Select(column => GetPropertyStringValue(obj, column.Name)))})").ToList();
-		return $"insert into {mapping.TableName} ({columnNames}) values {string.Join(',', values)}; {dialect.SelectLastRow};";
+		return $"insert into [{mapping.TableName}] ({columnNames}) values {string.Join(',', values)}; {dialect.SelectLastRow};";
     }
 
     public string MapSelect<T>() where T : class
     {
         var mapping = GetMapping<T>();
-        return $"select * from {mapping.TableName};";
+        return $"select * from [{mapping.TableName}];";
     }
 
     public string MapSelect<T>(T obj) where T : class
     {
         var mapping = GetMapping<T>();
-        return $"select * from {mapping.TableName} where {MapPrimaryKeyCondition(obj, mapping)};";
+        return $"select * from [{mapping.TableName}] where {MapPrimaryKeyCondition(obj, mapping)};";
 	}
 
     public string MapUpdate<T>(T obj) where T : class
     {
         var mapping = GetMapping<T>();
-        return $"update {mapping.TableName} set {MapSet(mapping, obj)} where {MapPrimaryKeyCondition(obj, mapping)};";
+        return $"update [{mapping.TableName}] set {MapSet(mapping, obj)} where {MapPrimaryKeyCondition(obj, mapping)};";
     }
 
     public string MapUpdate<T>(T obj, Expression<Action<T>> memberInitializer) where T : class
     {
         var mapping = GetMapping<T>();
-        return $"update {mapping.TableName} set {MapSet(mapping, memberInitializer)} where {MapPrimaryKeyCondition(obj, mapping)};";
+        return $"update [{mapping.TableName}] set {MapSet(mapping, memberInitializer)} where {MapPrimaryKeyCondition(obj, mapping)};";
     }
 
     public string MapDelete<T>(T obj) where T : class
     {
         var mapping = GetMapping<T>();
-        return $"delete from {mapping.TableName} where {MapPrimaryKeyCondition(obj, mapping)};";
+        return $"delete from [{mapping.TableName}] where {MapPrimaryKeyCondition(obj, mapping)};";
 	}
 
 	public string MapDelete<T>(Expression<Func<T, bool>> predicate) where T : class
@@ -128,7 +128,7 @@ public class SqlMapper : ISqlMapper
 		var (memberExpression, valueExpression) = isLeftParameterExpression ? (body.Left, body.Right) : (body.Right, body.Left);
 		var member = ((MemberExpression)memberExpression).Member.Name;
 		var value = Expression.Lambda(valueExpression).Compile().DynamicInvoke();
-		return $"delete from {mapping.TableName} where [{member}]={GetStringValue(value)}";
+		return $"delete from [{mapping.TableName}] where [{member}]={GetStringValue(value)};";
 	}
 
 
@@ -149,7 +149,8 @@ public class SqlMapper : ISqlMapper
     {
         const string separator = ",";
         var assignments = new StringBuilder();
-        foreach (var column in mapping.Columns)
+		var columns = mapping.Columns.Where(x => x.Name != mapping.PrimaryKey.Name);
+		foreach (var column in columns)
             assignments.Append(MapAssignment(obj, column.Name)).Append(separator);
         assignments.Length -= separator.Length;
         return assignments.ToString();
@@ -170,7 +171,7 @@ public class SqlMapper : ISqlMapper
 
             var assignment = ((MemberAssignment)binding).Expression;
             var value = Expression.Lambda(assignment).Compile().DynamicInvoke();
-            assignments.Append($"{column}={GetStringValue(value)}");
+            assignments.Append($"[{column}]={GetStringValue(value)}");
             assignments.Append(separator);
         }
 
