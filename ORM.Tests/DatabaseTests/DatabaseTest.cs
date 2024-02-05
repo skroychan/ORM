@@ -74,6 +74,23 @@ public class DatabaseTest : IClassFixture<DatabaseFixture>, IDisposable
 		Assert.Equal(person2.Name, dbPerson2.Name);
 	}
 
+	[Theory]
+	[InlineData("Jane Doesn't")]
+	[InlineData("'hello'")]
+	[InlineData(".'.'.'.'.")]
+	[InlineData("'''''")]
+	public void Insert_Quotes(string name)
+	{
+		var person = new Person { Name = name };
+
+		var personId = Database.Insert(person);
+
+		Assert.Equal(typeof(long), personId.GetType());
+		var dbPerson = Assert.Single(Database.Select<Person>());
+		Assert.Equal(personId, dbPerson.Id);
+		Assert.Equal(name, person.Name);
+	}
+
 	[Fact]
 	public void Select_Specific()
 	{

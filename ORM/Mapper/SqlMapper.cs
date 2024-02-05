@@ -197,7 +197,7 @@ public class SqlMapper : ISqlMapper
 
 		var type = obj.GetType();
 		if (type == typeof(string) || type == typeof(char) || type == typeof(DateTime) || type.IsEnum)
-            return $"'{obj}'";
+            return $"'{obj.ToString().Replace("'", "''")}'";
 
 		return obj.ToString();
     }
