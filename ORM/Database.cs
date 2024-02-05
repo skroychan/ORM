@@ -18,11 +18,15 @@ public class Database
 	}
 
 
-    public Mapping<T> AddMapping<T>() where T : class
+	public Mapping<T>.MappingBuilder GetMappingBuilder<T>() where T : class
 	{
-		var mapping = new Mapping<T>();
-		sqlMapper.AddMapping(mapping);
-		return mapping;
+		return new Mapping<T>.MappingBuilder();
+	}
+
+    public void AddMapping<T>(Mapping<T>.MappingBuilder mappingBuilder = null) where T : class
+	{
+		mappingBuilder ??= GetMappingBuilder<T>();
+		sqlMapper.AddMapping(mappingBuilder.Build());
 	}
 
 	public long Initialize()

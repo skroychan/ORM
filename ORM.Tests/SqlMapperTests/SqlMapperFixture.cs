@@ -13,10 +13,12 @@ public class SqlMapperFixture : IDisposable
 	{
 		Mapper = new SqlMapper(new SqliteDialect());
 
-		var personMapping = new Mapping<Person>()
-			.Ignore(x => x.Contacts);
-		var contactInfoMapping = new Mapping<ContactInfo>()
-			.AddForeignKey(x => x.PersonId, typeof(Person));
+		var personMapping = new Mapping<Person>.MappingBuilder()
+			.Ignore(x => x.Contacts)
+			.Build();
+		var contactInfoMapping = new Mapping<ContactInfo>.MappingBuilder()
+			.AddForeignKey(x => x.PersonId, typeof(Person))
+			.Build();
 
 		Mapper.AddMapping(personMapping);
 		Mapper.AddMapping(contactInfoMapping);

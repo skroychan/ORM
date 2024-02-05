@@ -14,10 +14,10 @@ public class DatabaseFixture : IDisposable
 		Database.DropTable(nameof(ContactInfo));
 		Database.DropTable(nameof(Person));
 
-		Database.AddMapping<Person>()
-			.Ignore(x => x.Contacts);
-		Database.AddMapping<ContactInfo>()
-			.AddForeignKey(x => x.PersonId, typeof(Person));
+		Database.AddMapping(new Mapping<Person>.MappingBuilder()
+			.Ignore(x => x.Contacts));
+		Database.AddMapping(new Mapping<ContactInfo>.MappingBuilder()
+			.AddForeignKey(x => x.PersonId, typeof(Person)));
 
 		Database.Initialize();
 	}
