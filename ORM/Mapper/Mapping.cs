@@ -13,7 +13,7 @@ public abstract class Mapping
 
 public class Mapping<T> : Mapping where T : class
 {
-	private const string defaultPrimaryKey = "Id";
+	internal const string defaultPrimaryKey = "Id";
 
 
     private Mapping()

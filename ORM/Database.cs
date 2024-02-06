@@ -26,7 +26,7 @@ public class Database
     public void AddMapping<T>(Mapping<T>.MappingBuilder mappingBuilder = null) where T : class
 	{
 		mappingBuilder ??= GetMappingBuilder<T>();
-		sqlMapper.AddMapping(mappingBuilder.Build());
+		sqlMapper.AddMapping(mappingBuilder);
 	}
 
 	public long Initialize()

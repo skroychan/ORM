@@ -17,9 +17,17 @@ public class SqlMapper : ISqlMapper
     }
 
 
-    public void AddMapping<T>(Mapping<T> mapping) where T : class
+    public void AddMapping<T>(Mapping<T>.MappingBuilder mappingBuilder) where T : class
     {
-        Mappings.Add(typeof(T), mapping);
+		var mapping = mappingBuilder.Build();
+		foreach (var foreignKey in mapping.Columns.Where(x => x.Name.EndsWith(Mapping<T>.defaultPrimaryKey)))
+		{
+            var referencedTypeName = foreignKey.Name[..foreignKey.Name.LastIndexOf(Mapping<T>.defaultPrimaryKey)];
+            var referencedType = Mappings.Keys.SingleOrDefault(x => nameof(x) == referencedTypeName);
+            if (referencedType != null)
+                mappingBuilder.AddForeignKey(x => foreignKey.Name, referencedType);
+		}
+		Mappings.Add(typeof(T), mappingBuilder.Build());
     }
 
     public IEnumerable<Column> GetColumns<T>()

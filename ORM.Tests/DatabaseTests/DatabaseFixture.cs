@@ -1,4 +1,5 @@
-﻿using skroy.ORM.Tests.Entities;
+﻿using skroy.ORM.Mapper;
+using skroy.ORM.Tests.Entities;
 
 namespace skroy.ORM.Tests.DatabaseTests;
 
@@ -16,8 +17,7 @@ public class DatabaseFixture : IDisposable
 
 		Database.AddMapping(new Mapping<Person>.MappingBuilder()
 			.Ignore(x => x.Contacts));
-		Database.AddMapping(new Mapping<ContactInfo>.MappingBuilder()
-			.AddForeignKey(x => x.PersonId, typeof(Person)));
+		Database.AddMapping(new Mapping<ContactInfo>.MappingBuilder());
 
 		Database.Initialize();
 	}
