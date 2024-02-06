@@ -45,7 +45,10 @@ public class Mapping<T> : Mapping where T : class
 		public MappingBuilder SetPrimaryKey<P>(Expression<Func<T, P>> selector)
 		{
 			var expression = (MemberExpression)selector.Body;
-			mapping.PrimaryKey = mapping.Columns.Single(x => x.Name == expression.Member.Name);
+			var column = mapping.Columns.Single(x => x.Name == expression.Member.Name);
+			if (column.IsNullable)
+				throw new ArgumentException($"Cannot set a nullable column [{column.Name}] as a primary key for table [{mapping.TableName}].");
+			mapping.PrimaryKey = column;
 
 			return this;
 		}
