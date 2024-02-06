@@ -2,7 +2,7 @@
 
 namespace skroy.ORM.Adapters;
 
-public class MySqlAdapter : IDbAdapter
+internal class MySqlAdapter : IDbAdapter
 {
 	public long ExecuteNonQuery(string query)
 	{

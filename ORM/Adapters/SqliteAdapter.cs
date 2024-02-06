@@ -3,7 +3,7 @@ using skroy.ORM.Mapper;
 
 namespace skroy.ORM.Adapters;
 
-public class SqliteAdapter : IDbAdapter
+internal class SqliteAdapter : IDbAdapter
 {
 	private readonly SqliteConnection connection;
 

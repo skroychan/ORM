@@ -3,7 +3,7 @@ using skroy.ORM.Dialects;
 
 namespace skroy.ORM;
 
-public static class Configuration
+internal static class Configuration
 {
     public static (Dialect, IDbAdapter) GetConfiguration(DatabaseProvider databaseProvider, string connectionString)
     {

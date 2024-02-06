@@ -2,7 +2,7 @@
 
 namespace skroy.ORM.Adapters;
 
-public interface IDbAdapter
+internal interface IDbAdapter
 {
 	public long ExecuteNonQuery(string query);
 	public T ExecuteScalar<T>(string query);

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace skroy.ORM.Mapper;
 
-public class SqlMapper : ISqlMapper
+internal class SqlMapper : ISqlMapper
 {
     private readonly Dialect dialect;
     private readonly Dictionary<Type, Mapping> Mappings;

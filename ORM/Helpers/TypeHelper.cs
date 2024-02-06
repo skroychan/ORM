@@ -2,7 +2,7 @@
 
 namespace skroy.ORM.Helpers;
 
-public static class TypeHelper
+internal static class TypeHelper
 {
     public static Type GetUnderlyingType(PropertyInfo propertyInfo, out bool isNullable)
     {

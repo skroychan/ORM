@@ -1,6 +1,6 @@
 ﻿namespace skroy.ORM.Dialects;
 
-public abstract class Dialect
+internal abstract class Dialect
 {
 	public virtual string AutoIncrement => "auto_increment";
 	public virtual string SelectLastRow => "select last_insert_rowid()";

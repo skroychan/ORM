@@ -1,6 +1,6 @@
 ﻿namespace skroy.ORM.Dialects;
 
-public class MySqlDialect : Dialect
+internal class MySqlDialect : Dialect
 {
 	public override string GetDbType(Type type)
 	{

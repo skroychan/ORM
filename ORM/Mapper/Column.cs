@@ -1,3 +1,3 @@
 ﻿namespace skroy.ORM.Mapper;
 
-public record Column(string Name, Type Type, bool IsNullable);
+internal record Column(string Name, Type Type, bool IsNullable);
