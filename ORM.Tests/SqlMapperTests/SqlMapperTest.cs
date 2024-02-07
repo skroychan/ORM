@@ -49,6 +49,32 @@ public class SqlMapperTest : IClassFixture<SqlMapperFixture>
 			"foreign key([PersonId]) references [Person]([Id]));", query);
 	}
 
+	[Theory]
+	[InlineData(true, "create unique index idx_Name on [Person] ([Name]);")]
+	[InlineData(false, "create index idx_Name on [Person] ([Name]);")]
+	public void Create_Indices(bool isUnique, string expectedQuery)
+	{
+		var mappingBuilder = new Mapping<Person>.MappingBuilder();
+		mappingBuilder.AddIndex(isUnique, x => x.Name);
+		Mapper.AddMapping(mappingBuilder.Ignore(x => x.Contacts));
+
+		var query = Mapper.MapCreate();
+
+		Assert.Contains(expectedQuery, query);
+	}
+
+	[Fact]
+	public void Create_CompositeIndices()
+	{
+		var mappingBuilder = new Mapping<Person>.MappingBuilder();
+		mappingBuilder.AddIndex(true, x => x.Name, x => x.Gender);
+		Mapper.AddMapping(mappingBuilder.Ignore(x => x.Contacts));
+
+		var query = Mapper.MapCreate();
+
+		Assert.Contains("create unique index idx_Name_Gender on [Person] ([Name],[Gender]);", query);
+	}
+
 	[Fact]
 	public void Insert()
 	{

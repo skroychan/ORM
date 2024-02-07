@@ -6,7 +6,7 @@ namespace skroy.ORM.Tests.SqlMapperTests;
 
 public class SqlMapperFixture : IDisposable
 {
-	public ISqlMapper Mapper { get; private set; }
+	internal ISqlMapper Mapper { get; private set; }
 
 
 	public SqlMapperFixture()
@@ -15,7 +15,8 @@ public class SqlMapperFixture : IDisposable
 
 		var personMapping = new Mapping<Person>.MappingBuilder()
 			.Ignore(x => x.Contacts);
-		var contactInfoMapping = new Mapping<ContactInfo>.MappingBuilder();
+		var contactInfoMapping = new Mapping<ContactInfo>.MappingBuilder()
+			.AddForeignKey(x => x.PersonId, typeof(Person));
 
 		Mapper.AddMapping(personMapping);
 		Mapper.AddMapping(contactInfoMapping);

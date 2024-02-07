@@ -69,6 +69,22 @@ internal class SqlMapper : ISqlMapper
             }
             sb.Remove(sb.Length - 1, 1);
             sb.Append(");");
+
+            foreach (var index in mapping.Indices)
+            {
+                sb.Append("create ");
+                if (index.IsUnique)
+                    sb.Append("unique ");
+				var indexColumns = index.Columns.Select(x => x.Name).ToArray();
+                sb.Append("index ")
+                    .Append("idx_")
+                    .Append(string.Join("_", indexColumns))
+                    .Append(" on [")
+                    .Append(mapping.TableName)
+                    .Append("] (")
+                    .Append(string.Join(',', indexColumns.Select(x => $"[{x}]")))
+                    .Append(");");
+            }
         }
 
         return sb.ToString();

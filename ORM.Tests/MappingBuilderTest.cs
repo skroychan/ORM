@@ -72,6 +72,22 @@ public class MappingBuilderTest
 	}
 
 	[Fact]
+	public void AddIndex()
+	{
+		var mapping = mappingBuilder
+			.AddIndex(true, x => x.Name, x => x.DateOfBirth)
+			.Build();
+
+		var index = Assert.Single(mapping.Indices);
+		Assert.True(index.IsUnique);
+		Assert.Equal(2, index.Columns.Count());
+		var column = index.Columns.Single(x => x.Name == "Name");
+		Assert.Equal(typeof(string), column.Type);
+		column = index.Columns.Single(x => x.Name == "DateOfBirth");
+		Assert.Equal(typeof(DateTime), column.Type);
+	}
+
+	[Fact]
 	public void Ignore()
 	{
 		var mapping = mappingBuilder
