@@ -17,7 +17,7 @@ internal class SqlMapper : ISqlMapper
     }
 
 
-    public void AddMapping<T>(Mapping<T>.MappingBuilder mappingBuilder) where T : class
+    public void AddMapping<T>(Mapping<T>.Builder mappingBuilder) where T : class
     {
 		var mapping = mappingBuilder.Build();
 		foreach (var foreignKey in mapping.Columns.Where(x => x.Name.EndsWith(Mapping<T>.defaultPrimaryKey)))

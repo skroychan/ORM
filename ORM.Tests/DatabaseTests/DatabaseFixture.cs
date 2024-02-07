@@ -10,14 +10,14 @@ public class DatabaseFixture : IDisposable
 
 	public DatabaseFixture()
 	{
-		Database = new Database(DatabaseProvider.Sqlite, $"Data Source=notes.db;");
+		Database = Database.GetSqliteDatabase($"Data Source=notes.db;");
 
 		Database.DropTable(nameof(ContactInfo));
 		Database.DropTable(nameof(Person));
 
-		Database.AddMapping(new Mapping<Person>.MappingBuilder()
+		Database.AddMapping(new Mapping<Person>.Builder()
 			.Ignore(x => x.Contacts));
-		Database.AddMapping(new Mapping<ContactInfo>.MappingBuilder());
+		Database.AddMapping(new Mapping<ContactInfo>.Builder());
 
 		Database.Initialize();
 	}

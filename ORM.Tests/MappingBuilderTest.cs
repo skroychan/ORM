@@ -6,12 +6,12 @@ namespace skroy.ORM.Tests;
 
 public class MappingBuilderTest
 {
-	public readonly Mapping<Person>.MappingBuilder mappingBuilder;
+	public readonly Mapping<Person>.Builder mappingBuilder;
 
 
     public MappingBuilderTest()
     {
-		mappingBuilder = new Mapping<Person>.MappingBuilder();
+		mappingBuilder = new Mapping<Person>.Builder();
     }
 
 

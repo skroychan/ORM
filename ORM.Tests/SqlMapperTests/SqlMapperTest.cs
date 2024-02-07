@@ -54,7 +54,7 @@ public class SqlMapperTest : IClassFixture<SqlMapperFixture>
 	[InlineData(false, "create index idx_Name on [Person] ([Name]);")]
 	public void Create_Indices(bool isUnique, string expectedQuery)
 	{
-		var mappingBuilder = new Mapping<Person>.MappingBuilder();
+		var mappingBuilder = new Mapping<Person>.Builder();
 		mappingBuilder.AddIndex(isUnique, x => x.Name);
 		Mapper.AddMapping(mappingBuilder.Ignore(x => x.Contacts));
 
@@ -66,7 +66,7 @@ public class SqlMapperTest : IClassFixture<SqlMapperFixture>
 	[Fact]
 	public void Create_CompositeIndices()
 	{
-		var mappingBuilder = new Mapping<Person>.MappingBuilder();
+		var mappingBuilder = new Mapping<Person>.Builder();
 		mappingBuilder.AddIndex(true, x => x.Name, x => x.Gender);
 		Mapper.AddMapping(mappingBuilder.Ignore(x => x.Contacts));
 

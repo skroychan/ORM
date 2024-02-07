@@ -22,12 +22,12 @@ public class Mapping<T> : Mapping where T : class
     }
 
 
-	public class MappingBuilder
+	public class Builder
 	{
 		private readonly Mapping<T> mapping;
 
 
-		internal MappingBuilder()
+		internal Builder()
 		{
 			mapping = new Mapping<T>();
 			mapping.TableName = typeof(T).Name;
@@ -44,7 +44,7 @@ public class Mapping<T> : Mapping where T : class
 
 		internal Mapping<T> Build() => mapping;
 
-		public MappingBuilder SetPrimaryKey<P>(Expression<Func<T, P>> selector)
+		public Builder SetPrimaryKey<P>(Expression<Func<T, P>> selector)
 		{
 			var memberName = ExpessionHelper.GetMemberName(selector);
 			var column = mapping.Columns.Single(x => x.Name == memberName);
@@ -55,7 +55,7 @@ public class Mapping<T> : Mapping where T : class
 			return this;
 		}
 
-		public MappingBuilder AddForeignKey<P>(Expression<Func<T, P>> selector, Type foreignType)
+		public Builder AddForeignKey<P>(Expression<Func<T, P>> selector, Type foreignType)
 		{
 			var memberName = ExpessionHelper.GetMemberName(selector);
 			var column = mapping.Columns.Single(x => x.Name == memberName);
@@ -64,7 +64,7 @@ public class Mapping<T> : Mapping where T : class
 			return this;
 		}
 
-		public MappingBuilder AddIndex(bool isUnique, params Expression<Func<T, object>>[] selectors)
+		public Builder AddIndex(bool isUnique, params Expression<Func<T, object>>[] selectors)
 		{
 			if (selectors.Length == 0)
 				throw new ArgumentException("No columns specified for index.");
@@ -82,7 +82,7 @@ public class Mapping<T> : Mapping where T : class
 			return this;
 		}
 
-		public MappingBuilder Ignore<P>(Expression<Func<T, P>> selector)
+		public Builder Ignore<P>(Expression<Func<T, P>> selector)
 		{
 			var memberName = ExpessionHelper.GetMemberName(selector);
 			mapping.Columns.RemoveAll(x => x.Name == memberName);

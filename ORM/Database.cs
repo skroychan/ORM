@@ -1,4 +1,5 @@
 ﻿using skroy.ORM.Adapters;
+using skroy.ORM.Dialects;
 using skroy.ORM.Mapper;
 using System.Linq.Expressions;
 
@@ -6,80 +7,89 @@ namespace skroy.ORM;
 
 public class Database
 {
-	private readonly SqlMapper sqlMapper;
+	private readonly ISqlMapper mapper;
 	private readonly IDbAdapter adapter;
 
 
-	public Database(DatabaseProvider databaseProvider, string connectionString)
+	private Database(IDbAdapter dbAdapter, ISqlMapper sqlMapper)
     {
-		var (sqlDialect, dbAdapter) = Configuration.GetConfiguration(databaseProvider, connectionString);
-		sqlMapper = new SqlMapper(sqlDialect);
+		mapper = sqlMapper;
 		adapter = dbAdapter;
 	}
 
 
-	public Mapping<T>.MappingBuilder GetMappingBuilder<T>() where T : class
+	public static Database GetSqliteDatabase(string connectionString)
 	{
-		return new Mapping<T>.MappingBuilder();
+		var mapper = new SqlMapper(new SqliteDialect());
+		var adapter = new SqliteAdapter(connectionString);
+		var database = new Database(adapter, mapper);
+
+		return database;
 	}
 
-    public void AddMapping<T>(Mapping<T>.MappingBuilder mappingBuilder = null) where T : class
+
+	public Mapping<T>.Builder GetMappingBuilder<T>() where T : class
+	{
+		return new Mapping<T>.Builder();
+	}
+
+    public void AddMapping<T>(Mapping<T>.Builder mappingBuilder = null) where T : class
 	{
 		mappingBuilder ??= GetMappingBuilder<T>();
-		sqlMapper.AddMapping(mappingBuilder);
+		mapper.AddMapping(mappingBuilder);
 	}
 
 	public long Initialize()
 	{
-		var query = sqlMapper.MapCreate();
+		var query = mapper.MapCreate();
 		return adapter.ExecuteNonQuery(query);
 	}
 
 	public object Insert<T>(T obj) where T : class
 	{
-		var query = sqlMapper.MapInsert(obj);
+		var query = mapper.MapInsert(obj);
 		return adapter.ExecuteScalar<object>(query);
 	}
 
 	public object Insert<T>(params T[] objs) where T : class
 	{
-		var query = sqlMapper.MapInsert(objs);
+		var query = mapper.MapInsert(objs);
 		return adapter.ExecuteScalar<object>(query);
 	}
 
 	public IEnumerable<T> Select<T>() where T : class, new()
 	{
-		var query = sqlMapper.MapSelect<T>();
-		return adapter.ExecuteVector<T>(query, [.. sqlMapper.GetColumns<T>()]);
+		var query = mapper.MapSelect<T>();
+		return adapter.ExecuteVector<T>(query, [.. mapper.GetColumns<T>()]);
 	}
 
 	public T Select<T>(T obj) where T : class, new()
 	{
-		var query = sqlMapper.MapSelect(obj);
-		return adapter.ExecuteVector<T>(query, [.. sqlMapper.GetColumns<T>()]).SingleOrDefault();
+		var query = mapper.MapSelect(obj);
+		return adapter.ExecuteVector<T>(query, [.. mapper.GetColumns<T>()]).SingleOrDefault();
 	}
 
 	public long Update<T>(T obj) where T : class
 	{
-		var query = sqlMapper.MapUpdate(obj);
+		var query = mapper.MapUpdate(obj);
 		return adapter.ExecuteNonQuery(query);
 	}
 
 	public long Update<T>(T obj, Expression<Action<T>> memberInitializer) where T : class
 	{
-		var query = sqlMapper.MapUpdate(obj, memberInitializer);
+		var query = mapper.MapUpdate(obj, memberInitializer);
 		return adapter.ExecuteNonQuery(query);
 	}
 
 	public long Delete<T>(T obj) where T : class
 	{
-		var query = sqlMapper.MapDelete(obj);
+		var query = mapper.MapDelete(obj);
 		return adapter.ExecuteNonQuery(query);
 	}
 
 	public long Delete<T>(Expression<Func<T, bool>> predicate) where T : class
 	{
-		var query = sqlMapper.MapDelete(predicate);
+		var query = mapper.MapDelete(predicate);
 		return adapter.ExecuteNonQuery(query);
 	}
 }
