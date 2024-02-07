@@ -27,7 +27,7 @@ internal class SqlMapper : ISqlMapper
             if (referencedType != null)
                 mappingBuilder.AddForeignKey(x => foreignKey.Name, referencedType);
 		}
-		Mappings.Add(typeof(T), mappingBuilder.Build());
+		Mappings[typeof(T)] = mappingBuilder.Build();
     }
 
     public IEnumerable<Column> GetColumns<T>()
@@ -58,7 +58,7 @@ internal class SqlMapper : ISqlMapper
             foreach (var foreignKey in mapping.ForeignKeys)
             {
                 if (!Mappings.TryGetValue(foreignKey.Value, out var referencedTable))
-                    throw new ArgumentException($"Mapping of referenced table of type {foreignKey.Value} doesn't exist");
+                    throw new ArgumentException($"Mapping of referenced table of type {foreignKey.Value} doesn't exist.");
 
                 sb.Append("foreign key([")
                     .Append(foreignKey.Key.Name)
@@ -86,7 +86,7 @@ internal class SqlMapper : ISqlMapper
 	public string MapInsert<T>(params T[] objs) where T : class
     {
         if (objs.Length == 0 || objs.Length > 1000)
-            throw new ArgumentException("Insert statement must have between 1 and 1000 values");
+            throw new ArgumentException("Insert statement must have between 1 and 1000 values.");
 
         var mapping = GetMapping<T>();
 		var columns = mapping.Columns.Where(x => x.Name != mapping.PrimaryKey.Name);
@@ -130,7 +130,7 @@ internal class SqlMapper : ISqlMapper
 		var mapping = GetMapping<T>();
 		var body = predicate.Body as BinaryExpression;
         if (body == null || body.NodeType != ExpressionType.Equal)
-            throw new ArgumentException("Expression is not a value equality comparison");
+            throw new ArgumentException("Expression is not a value equality comparison.");
 
 		var isLeftParameterExpression = body.Left is MemberExpression me && me.Expression is ParameterExpression pe && pe.Name == predicate.Parameters.Single().Name;
 		var (memberExpression, valueExpression) = isLeftParameterExpression ? (body.Left, body.Right) : (body.Right, body.Left);
@@ -143,7 +143,7 @@ internal class SqlMapper : ISqlMapper
 	private Mapping<T> GetMapping<T>() where T : class
     {
         if (!Mappings.TryGetValue(typeof(T), out var mapping))
-            throw new ArgumentException($"Cannot find mapping for {typeof(T)}");
+            throw new ArgumentException($"Cannot find mapping for {typeof(T)}.");
 
         return (Mapping<T>)mapping;
     }
@@ -169,7 +169,7 @@ internal class SqlMapper : ISqlMapper
         const string separator = ",";
         var assignments = new StringBuilder();
 		if (memberInitializer.Body is not MemberInitExpression expression)
-			throw new ArgumentException("Expression is not a member initializer");
+			throw new ArgumentException("Expression is not a member initializer.");
 
 		foreach (var binding in expression.Bindings)
         {
