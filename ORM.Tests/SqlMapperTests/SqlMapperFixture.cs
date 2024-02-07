@@ -15,8 +15,7 @@ public class SqlMapperFixture : IDisposable
 
 		var personMapping = new Mapping<Person>.MappingBuilder()
 			.Ignore(x => x.Contacts);
-		var contactInfoMapping = new Mapping<ContactInfo>.MappingBuilder()
-			.AddForeignKey(x => x.PersonId, typeof(Person));
+		var contactInfoMapping = new Mapping<ContactInfo>.MappingBuilder();
 
 		Mapper.AddMapping(personMapping);
 		Mapper.AddMapping(contactInfoMapping);

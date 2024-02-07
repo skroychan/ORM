@@ -1,5 +1,5 @@
-﻿using System.Linq.Expressions;
-using skroy.ORM.Helpers;
+﻿using skroy.ORM.Helpers;
+using System.Linq.Expressions;
 
 namespace skroy.ORM.Mapper;
 
@@ -46,8 +46,8 @@ public class Mapping<T> : Mapping where T : class
 
 		public MappingBuilder SetPrimaryKey<P>(Expression<Func<T, P>> selector)
 		{
-			var expression = (MemberExpression)selector.Body;
-			var column = mapping.Columns.Single(x => x.Name == expression.Member.Name);
+			var memberName = ExpessionHelper.GetMemberName(selector);
+			var column = mapping.Columns.Single(x => x.Name == memberName);
 			if (column.IsNullable)
 				throw new ArgumentException($"Cannot set a nullable column [{column.Name}] as a primary key for table [{mapping.TableName}].");
 			mapping.PrimaryKey = column;
@@ -57,8 +57,8 @@ public class Mapping<T> : Mapping where T : class
 
 		public MappingBuilder AddForeignKey<P>(Expression<Func<T, P>> selector, Type foreignType)
 		{
-			var expression = (MemberExpression)selector.Body;
-			var column = mapping.Columns.Single(x => x.Name == expression.Member.Name);
+			var memberName = ExpessionHelper.GetMemberName(selector);
+			var column = mapping.Columns.Single(x => x.Name == memberName);
 			mapping.ForeignKeys[column] = foreignType;
 
 			return this;
@@ -72,11 +72,8 @@ public class Mapping<T> : Mapping where T : class
 			var columns = new List<Column>();
 			foreach (var selector in selectors)
 			{
-				var expression = selector.Body;
-				if (expression is UnaryExpression ue && ue.NodeType == ExpressionType.Convert)
-					expression = ue.Operand;
-				var memberExpression = (MemberExpression)expression;
-				var column = mapping.Columns.Single(x => x.Name == memberExpression.Member.Name);
+				var memberName = ExpessionHelper.GetMemberName(selector);
+				var column = mapping.Columns.Single(x => x.Name == memberName);				
 				columns.Add(column);
 			}
 
@@ -87,8 +84,8 @@ public class Mapping<T> : Mapping where T : class
 
 		public MappingBuilder Ignore<P>(Expression<Func<T, P>> selector)
 		{
-			var expression = (MemberExpression)selector.Body;
-			mapping.Columns.RemoveAll(x => x.Name == expression.Member.Name);
+			var memberName = ExpessionHelper.GetMemberName(selector);
+			mapping.Columns.RemoveAll(x => x.Name == memberName);
 
 			return this;
 		}

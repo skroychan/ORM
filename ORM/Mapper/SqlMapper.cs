@@ -23,9 +23,15 @@ internal class SqlMapper : ISqlMapper
 		foreach (var foreignKey in mapping.Columns.Where(x => x.Name.EndsWith(Mapping<T>.defaultPrimaryKey)))
 		{
             var referencedTypeName = foreignKey.Name[..foreignKey.Name.LastIndexOf(Mapping<T>.defaultPrimaryKey)];
-            var referencedType = Mappings.Keys.SingleOrDefault(x => nameof(x) == referencedTypeName);
+            var referencedType = Mappings.Keys.SingleOrDefault(x => x.Name == referencedTypeName);
             if (referencedType != null)
-                mappingBuilder.AddForeignKey(x => foreignKey.Name, referencedType);
+            {
+                var param = Expression.Parameter(typeof(T));
+                var body = Expression.Property(param, foreignKey.Name);
+                var convert = Expression.Convert(body, typeof(object));
+                var lambda = Expression.Lambda<Func<T, object>>(convert, param);
+                mappingBuilder.AddForeignKey(lambda, referencedType);
+            }
 		}
 		Mappings[typeof(T)] = mappingBuilder.Build();
     }
