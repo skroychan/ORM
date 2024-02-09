@@ -5,6 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <RootNamespace>skroy.ORM</RootNamespace>
+		<VersionPrefix>0.1</VersionPrefix>
+		<PackageId>skroy.ORM</PackageId>
+		<Authors>skroy</Authors>
   </PropertyGroup>
 
   <ItemGroup>
