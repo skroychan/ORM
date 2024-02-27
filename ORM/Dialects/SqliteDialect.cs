@@ -1,6 +1,6 @@
 ﻿namespace skroy.ORM.Dialects;
 
-internal class SqliteDialect : Dialect
+internal class SqliteDialect : SqlDialect
 {
 	public override string AutoIncrement => "autoincrement";
 

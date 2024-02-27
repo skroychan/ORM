@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using MySql.Data.MySqlClient;
 using skroy.ORM.Adapters;
 using skroy.ORM.Dialects;
 using skroy.ORM.Mapper;
@@ -23,6 +24,15 @@ public class Database
 	{
 		var mapper = new SqlMapper(new SqliteDialect());
 		var adapter = new DbAdapter<SqliteConnection>(connectionString);
+		var database = new Database(adapter, mapper);
+
+		return database;
+	}
+
+	public static Database GetMySqlDatabase(string connectionString)
+	{
+		var mapper = new SqlMapper(new MySqlDialect());
+		var adapter = new DbAdapter<MySqlConnection>(connectionString);
 		var database = new Database(adapter, mapper);
 
 		return database;

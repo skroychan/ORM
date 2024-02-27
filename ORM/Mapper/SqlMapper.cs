@@ -6,11 +6,11 @@ namespace skroy.ORM.Mapper;
 
 internal class SqlMapper : ISqlMapper
 {
-    private readonly Dialect dialect;
+    private readonly SqlDialect dialect;
     private readonly Dictionary<Type, Mapping> Mappings;
 
 
-    public SqlMapper(Dialect sqlDialect)
+    public SqlMapper(SqlDialect sqlDialect)
     {
         dialect = sqlDialect;
         Mappings = [];
