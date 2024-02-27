@@ -96,13 +96,22 @@ public class DatabaseTest : IClassFixture<DatabaseFixture>, IDisposable
 	{
 		var person = new Person { Name = "Test", Gender = Gender.Other, DateOfBirth = new DateTime(1990, 1, 1) };
 		person.Id = (long)Database.Insert(person);
+		var contactInfo = new ContactInfo { Email = "skroy@example.com", PersonId = person.Id, IsDeleted = true, Phone = "+1234567890", Latitude = 12.345, Longitude = -76.54321 };
+		contactInfo.Id = (long)Database.Insert(contactInfo);
 
 		var dbPerson = Database.Select(person);
+		var dbContactInfo = Database.Select(contactInfo);
 
 		Assert.Equal(person.Id, dbPerson.Id);
 		Assert.Equal(person.Name, dbPerson.Name);
 		Assert.Equal(person.Gender, dbPerson.Gender);
 		Assert.Equal(person.DateOfBirth, dbPerson.DateOfBirth);
+		Assert.Equal(contactInfo.Id, dbContactInfo.Id);
+		Assert.Equal(contactInfo.PersonId, dbContactInfo.PersonId);
+		Assert.Equal(contactInfo.IsDeleted, dbContactInfo.IsDeleted);
+		Assert.Equal(contactInfo.Phone, dbContactInfo.Phone);
+		Assert.Equal(contactInfo.Latitude, dbContactInfo.Latitude);
+		Assert.Equal(contactInfo.Longitude, dbContactInfo.Longitude);
 	}
 
 	[Fact]
@@ -171,15 +180,15 @@ public class DatabaseTest : IClassFixture<DatabaseFixture>, IDisposable
 	{
 		var person1 = new Person();
 		var person2 = new Person();
-		var person3 = new Person();
+		var person3 = new Person { Name = "Test" };
 		person1.Id = (long)Database.Insert(person1);
 		person2.Id = (long)Database.Insert(person2);
 		person3.Id = (long)Database.Insert(person3);
-		var lambda = () => person3.Id;
+		var lambda = () => person2.Id;
 
 		var affectedRows = Database.Delete<Person>(x => person1.Id == x.Id);
-		affectedRows += Database.Delete<Person>(x => x.Id == person2.Id);
 		affectedRows += Database.Delete<Person>(x => x.Id == lambda());
+		affectedRows += Database.Delete<Person>(x => x.Name == "Test");
 
 		Assert.Equal(3, affectedRows);
 		Assert.Empty(Database.Select<Person>());
