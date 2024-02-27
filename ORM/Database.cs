@@ -1,4 +1,5 @@
-﻿using skroy.ORM.Adapters;
+﻿using Microsoft.Data.Sqlite;
+using skroy.ORM.Adapters;
 using skroy.ORM.Dialects;
 using skroy.ORM.Mapper;
 using System.Linq.Expressions;
@@ -21,7 +22,7 @@ public class Database
 	public static Database GetSqliteDatabase(string connectionString)
 	{
 		var mapper = new SqlMapper(new SqliteDialect());
-		var adapter = new SqliteAdapter(connectionString);
+		var adapter = new DbAdapter<SqliteConnection>(connectionString);
 		var database = new Database(adapter, mapper);
 
 		return database;

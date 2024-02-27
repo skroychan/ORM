@@ -1,18 +1,23 @@
-﻿using Microsoft.Data.Sqlite;
-using skroy.ORM.Mapper;
+﻿using skroy.ORM.Mapper;
+using System.Data.Common;
 
 namespace skroy.ORM.Adapters;
 
-internal class SqliteAdapter : IDbAdapter
+internal class DbAdapter<TConnection> : IDbAdapter where TConnection : DbConnection, new()
 {
-	private readonly SqliteConnection connection;
+	private readonly TConnection connection;
 
 
-    public SqliteAdapter(string connectionString)
-    {
+    private DbAdapter() 
+	{
+	}
+
+	public DbAdapter(string connectionString)
+	{
 		try
 		{
-			connection = new SqliteConnection(connectionString);
+			connection = new TConnection();
+			connection.ConnectionString = connectionString;
 			connection.Open();
 		}
 		catch
@@ -20,19 +25,22 @@ internal class SqliteAdapter : IDbAdapter
 			connection?.Close();
 			throw;
 		}
-    }
+	}
 
 
 	public long ExecuteNonQuery(string query)
 	{
 		using var transaction = connection.BeginTransaction();
-
 		try
 		{
-			using var command = new SqliteCommand(query, connection, transaction);
+			using var command = connection.CreateCommand();
+			command.Transaction = transaction;
+			command.CommandText = query;
+
 			var result = command.ExecuteNonQuery();
 
 			transaction.Commit();
+
 			return result;
 		}
 		catch
@@ -48,7 +56,10 @@ internal class SqliteAdapter : IDbAdapter
 
 		try
 		{
-			using var command = new SqliteCommand(query, connection, transaction);
+			using var command = connection.CreateCommand();
+			command.Transaction = transaction;
+			command.CommandText = query;
+
 			var result = (T)command.ExecuteScalar();
 
 			transaction.Commit();
@@ -68,7 +79,10 @@ internal class SqliteAdapter : IDbAdapter
 
 		try
 		{
-			using var command = new SqliteCommand(query, connection, transaction);
+			using var command = connection.CreateCommand();
+			command.Transaction = transaction;
+			command.CommandText = query;
+
 			using var reader = command.ExecuteReader();
 
 			while (reader.Read())
@@ -91,14 +105,14 @@ internal class SqliteAdapter : IDbAdapter
 			throw;
 		}
 
-		object GetValue(SqliteDataReader reader, Column column)
+		object GetValue(DbDataReader reader, Column column)
 		{
 			if (reader.IsDBNull(reader.GetOrdinal(column.Name)))
 				return null;
 
 			if (column.Type.IsEnum && Enum.TryParse(column.Type, reader[column.Name].ToString(), out var result))
 				return result;
-			
+
 			return Convert.ChangeType(reader[column.Name], column.Type);
 		}
 	}
