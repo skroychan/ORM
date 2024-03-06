@@ -14,7 +14,7 @@ public class Database
 
 
 	private Database(IDbAdapter dbAdapter, ISqlMapper sqlMapper)
-    {
+	{
 		mapper = sqlMapper;
 		adapter = dbAdapter;
 	}
@@ -39,12 +39,12 @@ public class Database
 	}
 
 
-	public Mapping<T>.Builder GetMappingBuilder<T>() where T : class
+	public static Mapping<T>.Builder GetMappingBuilder<T>() where T : class
 	{
 		return new Mapping<T>.Builder();
 	}
 
-    public void AddMapping<T>(Mapping<T>.Builder mappingBuilder = null) where T : class
+	public void AddMapping<T>(Mapping<T>.Builder mappingBuilder = null) where T : class
 	{
 		mappingBuilder ??= GetMappingBuilder<T>();
 		mapper.AddMapping(mappingBuilder);

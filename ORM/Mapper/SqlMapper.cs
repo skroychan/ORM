@@ -17,6 +17,11 @@ internal class SqlMapper : ISqlMapper
     }
 
 
+    public void AddMapping<T>() where T : class
+    {
+        AddMapping(new Mapping<T>.Builder());
+    }
+
     public void AddMapping<T>(Mapping<T>.Builder mappingBuilder) where T : class
     {
 		var mapping = mappingBuilder.Build();
@@ -36,9 +41,9 @@ internal class SqlMapper : ISqlMapper
 		Mappings[typeof(T)] = mappingBuilder.Build();
     }
 
-    public IEnumerable<Column> GetColumns<T>()
-    {
-        return Mappings[typeof(T)].Columns;
+    public IEnumerable<Column> GetColumns<T>() where T : class
+	{
+        return GetMapping<T>().Columns;
     }
 
     public string MapCreate()
@@ -165,7 +170,10 @@ internal class SqlMapper : ISqlMapper
 	private Mapping<T> GetMapping<T>() where T : class
     {
         if (!Mappings.TryGetValue(typeof(T), out var mapping))
-            throw new ArgumentException($"Cannot find mapping for {typeof(T)}.");
+        {
+            AddMapping<T>();
+            mapping = Mappings[typeof(T)];
+        }
 
         return (Mapping<T>)mapping;
     }

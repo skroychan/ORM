@@ -36,7 +36,8 @@ public class Mapping<T> : Mapping where T : class
 				{
 					var type = TypeHelper.GetUnderlyingType(property, out var isNullable);
 					return new Column(property.Name, type, isNullable);
-				}).ToList();
+				})
+				.ToList();
 			mapping.PrimaryKey = mapping.Columns.Find(x => x.Name == defaultPrimaryKey);
 			mapping.Indices = new List<Index>();
 		}

@@ -5,7 +5,7 @@ namespace skroy.ORM.Mapper;
 internal interface ISqlMapper
 {
 	public void AddMapping<T>(Mapping<T>.Builder mappingBuilder) where T : class;
-	public IEnumerable<Column> GetColumns<T>();
+	public IEnumerable<Column> GetColumns<T>() where T : class;
 	public string MapCreate();
 	public string MapInsert<T>(T obj) where T : class;
 	public string MapInsert<T>(params T[] obj) where T : class;
